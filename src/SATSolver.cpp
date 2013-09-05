@@ -7,7 +7,8 @@
 
 #include "SATSolver.h"
 
-SATSolver::SATSolver() {
+SATSolver::SATSolver(vector<_formula*> CNFNlp) {
+    for
 }
 
 SATSolver::SATSolver(const SATSolver& orig) {

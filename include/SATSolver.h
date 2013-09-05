@@ -9,6 +9,7 @@
 #define	SATSOLVER_H
 
 #include <vector>
+#include "Solver.h"
 
 using namespace std;
 
@@ -18,7 +19,8 @@ public:
     SATSolver(const SATSolver& orig);
     ~SATSolver();
 private:
-    
+    vector<int> cnf_set;
+    int num_lits_in_NLP;
 };
 
 #endif	/* SATSOLVER_H */

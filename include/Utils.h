@@ -32,6 +32,8 @@ public:
     static bool inList(int tag, vector<int> list);
     static vector<int> divideListAt(int tag, vector<int> list);
     static bool crossList(vector<int> l1, vector<int> l2);
+    
+    static vector< vector<int> > convertToSATInput(vector<_formula*> cnfDlp);
 };
 
 

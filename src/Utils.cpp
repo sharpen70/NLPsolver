@@ -75,3 +75,7 @@ void Utils::joinFormulas(vector<_formula*> des_list, vector<_formula*> join_list
         des_list.push_back(join_list.at(i));
     }
 }
+
+vector< vector<int> > Utils::convertToSATInput(vector<_formula*> cnfDlp) {
+    for()
+}
