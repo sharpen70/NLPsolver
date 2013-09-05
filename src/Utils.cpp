@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "Rule.h"
 #include <assert.h>
 #include <cstdlib>
 #include <cstring>
@@ -76,6 +77,49 @@ void Utils::joinFormulas(vector<_formula*> des_list, vector<_formula*> join_list
     }
 }
 
-vector< vector<int> > Utils::convertToSATInput(vector<_formula*> cnfDlp) {
-    for()
+vector< set<int> > Utils::convertToSATInput(vector<_formula*> cnfDlp) {
+    vector< set<int> > res;
+    for(vector<_formula*>::iterator it = cnfDlp.begin(); it != cnfDlp.end(); it++) {
+        set<int> lits;
+        convertCNFformulaToLits(*it, lits);
+        res.push_back(lits);
+    }
+    return res;
+}
+
+void Utils::convertCNFformulaToLits(_formula* rule, set<int>& lits) {
+    if(rule->formula_type == ATOM) {
+        lits.insert(rule->predicate_id);
+    }
+    else if(rule->formula_type == NEGA) {
+        lits.insert(-1 * (rule->subformula_l->predicate_id));
+    }
+    else {
+        convertCNFformulaToLits(rule->subformula_l, lits);
+        convertCNFformulaToLits(rule->subformula_r, lits);
+    }
+}
+
+_formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
+    _formula* fml;
+    
+    if(rule.body_length == 0) return NULL;
+    
+    for(vector<int>::iterator it = rule.positive_literals.begin(); it != 
+            rule.positive_literals.end(); it++) {
+        if(fml == NULL) fml = Utils::compositeToAtom(*it);
+        else {
+            fml = Utils::compositeByConnective(CONJ, fml, Utils::compositeToAtom(*it));
+        }
+    }
+    for(vector<int>::iterator it = rule.negative_literals.begin(); it !=
+            rule.negative_literals.end(); it++) {
+        _formula* nega = Utils::compositeByConnective(NEGA, Utils::compositeToAtom(*it));
+        if(fml == NULL) fml = nega;
+        else {
+            fml = Utils::compositeByConnective(CONJ, fml, nega);
+        }
+    }
+    
+    return fml;
 }

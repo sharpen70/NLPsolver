@@ -11,6 +11,7 @@
 #include <cstdio>
 #include "structs.h"
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 #include "Vocabulary.h"
@@ -33,7 +34,10 @@ public:
     static vector<int> divideListAt(int tag, vector<int> list);
     static bool crossList(vector<int> l1, vector<int> l2);
     
-    static vector< vector<int> > convertToSATInput(vector<_formula*> cnfDlp);
+    static vector< set<int> > convertToSATInput(vector<_formula*> cnfDlp);
+    static void convertCNFformulaToLits(_formula* rule, set<int>& lits);
+    
+    static _formula* convertRuleBodyToFormula(const Rule& rule);
 };
 
 

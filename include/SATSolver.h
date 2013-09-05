@@ -15,12 +15,18 @@ using namespace std;
 
 class SATSolver {
 public:
-    SATSolver(vector<_formula*> CNFNlp);
+    SATSolver(vector< set<int> > cnf, int num_lits);
     SATSolver(const SATSolver& orig);
     ~SATSolver();
+    
+    void invokeSAT();
+    void outputResult();
+    vector< set<int> > models;
+    
 private:
-    vector<int> cnf_set;
+    Solver sat; 
     int num_lits_in_NLP;
+    bool isExistModel();
 };
 
 #endif	/* SATSOLVER_H */

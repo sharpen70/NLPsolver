@@ -24,80 +24,58 @@ vector<_formula*> ClakeCompletion::convert() {
     
     for(map<int, vector<Rule> >::iterator it = ipf_atoms_rules.begin(); it != 
             ipf_atoms_rules.end(); it++) {
-        vector<Rule> body = it->second;
+        vector<Rule> ipf_rules = it->second;
         _formula* tl = Utils::compositeToAtom(it->first);
         _formula* tr;
         
-        for(int i = 0; i < body.size(); i++) {
-            Rule rule = body.at(i);
-            for(int p = 0; p < rule.positive_literals.size(); p++) {
-                int id = rule.positive_literals.at(p);
-                if(tr == NULL) tr = Utils::compositeToAtom(id);
-                else {
-                    tr = Utils::compositeByConnective(CONJ, tr, Utils::compositeToAtom(id));
-                }
-            }
-            for(int p = 0; p < rule.negative_literals.size(); p++) {
-                int id = rule.negative_literals.at(p);
-                if(tr == NULL) tr = Utils::compositeToAtom(id);
-                else {
-                    _formula* nega = Utils::compositeByConnective(NEGA, Utils::compositeToAtom(id));
-                    tr = Utils::compositeByConnective(CONJ, tr, nega);
-                }
-            }
+        for(vector<Rule>::iterator it = ipf_rules.begin(); it != ipf_rules.end();
+                it++) {
+            _formula* fr = Utils::convertRuleBodyToFormula(*it);
+            if(fr == NULL) break;
+            if(tr == NULL) tr = fr;
+            else tr = Utils::compositeByConnective(DISJ, tr, fr);
         }
         
-        _formula* impl_l = Utils::compositeByConnective(IMPL, tl, tr);
-        _formula* impl_r = Utils::compositeByConnective(IMPL, tr, tl);
-        
-        
-        Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_l));
-        Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_r));
+        if(tr != NULL) {
+            _formula* impl_l = Utils::compositeByConnective(IMPL, tl, tr);
+            _formula* impl_r = Utils::compositeByConnective(IMPL, tr, tl);       
+
+            Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_l));
+            Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_r));
+        }
+        else {
+            completion.push_back(tl);
+        }
     }
     
-    for(int i = 0; i < no_ipf_atoms.size(); i++) {
+    for(vector<int>::iterator it = no_ipf_atoms.begin(); it != no_ipf_atoms.end;
+            it++) {
         _formula* nega_atom = Utils::compositeByConnective(NEGA, Utils::compositeToAtom(
-                no_ipf_atoms.at(i)));
+                *it));
         
         completion.push_back(nega_atom);
     }
     
-    for(int i = 0; i < constrants.size(); i++) {
-        Rule rule = constrants.at(i);
-        _formula* tr;
+    for(vector<Rule>::iterator it = constrants.begin(); it != constrants.end(); 
+            it++) {
+        _formula* fc = Utils::convertRuleBodyToFormula(*it);     
         
-        for(int p = 0; p < rule.positive_literals.size(); p++) {
-            int id = rule.positive_literals.at(p);
-            if(tr == NULL) tr = Utils::compositeToAtom(id);
-            else {
-                tr = Utils::compositeByConnective(CONJ, tr, Utils::compositeToAtom(id));
-            }
-        }
-        for(int p = 0; p < rule.negative_literals.size(); p++) {
-            int id = rule.negative_literals.at(p);
-            if(tr == NULL) tr = Utils::compositeToAtom(id);
-            else {
-                _formula* nega = Utils::compositeByConnective(NEGA, Utils::compositeToAtom(id));
-                tr = Utils::compositeByConnective(CONJ, tr, nega);
-            }
-        }
-        
-        tr = Utils::compositeByConnective(NEGA, tr);
-        Utils::joinFormulas(completion, NNFUtils::convertToNegativeNormalForm(tr));
+        fc = Utils::compositeByConnective(NEGA, fc);
+        Utils::joinFormulas(completion, NNFUtils::convertToNegativeNormalForm(fc));
     }
     
     return completion;
 }
 
 void ClakeCompletion::setDlp(const vector<Rule> nlp) {
-    for(int i = 0; i < nlp.size(); i++) {
-        int a = nlp.at(i).head;
+    for(vector<Rule>::iterator it = nlp.begin(); it != nlp.end(); it++) {
+        int a = it->head;
         
         if(a > 0) {
-            ipf_atoms_rules[a].push_back(nlp.at(i));
+            ipf_atoms_rules[a].push_back(*it);
         }
         else {
-            constrants.push_back(nlp.at(i));
+            constrants.push_back(*it);
         }
     }
     
