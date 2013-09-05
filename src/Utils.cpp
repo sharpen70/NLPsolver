@@ -103,17 +103,19 @@ void Utils::convertCNFformulaToLits(_formula* rule, set<int>& lits) {
 _formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
     _formula* fml;
     
+    Rule _rule(rule);
+    
     if(rule.body_length == 0) return NULL;
     
-    for(vector<int>::iterator it = rule.positive_literals.begin(); it != 
-            rule.positive_literals.end(); it++) {
+    for(vector<int>::iterator it = _rule.positive_literals.begin(); it != 
+            _rule.positive_literals.end(); it++) {
         if(fml == NULL) fml = Utils::compositeToAtom(*it);
         else {
             fml = Utils::compositeByConnective(CONJ, fml, Utils::compositeToAtom(*it));
         }
     }
-    for(vector<int>::iterator it = rule.negative_literals.begin(); it !=
-            rule.negative_literals.end(); it++) {
+    for(vector<int>::iterator it = _rule.negative_literals.begin(); it !=
+            _rule.negative_literals.end(); it++) {
         _formula* nega = Utils::compositeByConnective(NEGA, Utils::compositeToAtom(*it));
         if(fml == NULL) fml = nega;
         else {

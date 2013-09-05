@@ -35,6 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/minisat/Constraints.o \
+	${OBJECTDIR}/minisat/Solver.o \
 	${OBJECTDIR}/src/CNFUtils.o \
 	${OBJECTDIR}/src/ClakeCompletion.o \
 	${OBJECTDIR}/src/DependenceGraph.o \
@@ -72,6 +74,16 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/nlpsolver: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/nlpsolver ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/minisat/Constraints.o: minisat/Constraints.C 
+	${MKDIR} -p ${OBJECTDIR}/minisat
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/minisat/Constraints.o minisat/Constraints.C
+
+${OBJECTDIR}/minisat/Solver.o: minisat/Solver.C 
+	${MKDIR} -p ${OBJECTDIR}/minisat
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/minisat/Solver.o minisat/Solver.C
 
 ${OBJECTDIR}/src/CNFUtils.o: src/CNFUtils.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src

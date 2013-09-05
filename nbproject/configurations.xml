@@ -16,6 +16,20 @@
       <itemPath>include/Vocabulary.h</itemPath>
       <itemPath>include/structs.h</itemPath>
     </logicalFolder>
+    <logicalFolder name="minisat" displayName="minisat" projectFiles="true">
+      <itemPath>minisat/Constraints.C</itemPath>
+      <itemPath>minisat/Constraints.h</itemPath>
+      <itemPath>minisat/Global.h</itemPath>
+      <itemPath>minisat/Heap.h</itemPath>
+      <itemPath>minisat/LICENSE_MiniSAT</itemPath>
+      <itemPath>minisat/Queue.h</itemPath>
+      <itemPath>minisat/Solver.C</itemPath>
+      <itemPath>minisat/Solver.h</itemPath>
+      <itemPath>minisat/SolverTypes.h</itemPath>
+      <itemPath>minisat/Sort.h</itemPath>
+      <itemPath>minisat/VarOrder.h</itemPath>
+      <itemPath>minisat/notes</itemPath>
+    </logicalFolder>
     <logicalFolder name="parse" displayName="parse" projectFiles="true">
       <itemPath>parse/clean.sh</itemPath>
       <itemPath>parse/generate.sh</itemPath>
@@ -70,6 +84,7 @@
     <Elem>parse</Elem>
     <Elem>src</Elem>
     <Elem>res</Elem>
+    <Elem>minisat</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -84,9 +99,17 @@
         <ccTool>
           <incDir>
             <pElem>include</pElem>
+            <pElem>minisat</pElem>
           </incDir>
         </ccTool>
       </compileType>
+      <folder path="minisat">
+        <ccTool>
+          <incDir>
+            <pElem>minisat</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
       <item path="include/CNFUtils.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/ClakeCompletion.h" ex="false" tool="3" flavor2="0">
@@ -104,6 +127,30 @@
       <item path="include/Vocabulary.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/structs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Constraints.C" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="minisat/Constraints.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Global.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Heap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/LICENSE_MiniSAT" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Queue.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Solver.C" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="minisat/Solver.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/SolverTypes.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Sort.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/VarOrder.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/notes" ex="false" tool="3" flavor2="0">
       </item>
       <item path="parse/clean.sh" ex="false" tool="3" flavor2="0">
       </item>
@@ -182,6 +229,30 @@
       <item path="include/Vocabulary.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/structs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Constraints.C" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="minisat/Constraints.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Global.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Heap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/LICENSE_MiniSAT" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Queue.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Solver.C" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="minisat/Solver.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/SolverTypes.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/Sort.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/VarOrder.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="minisat/notes" ex="false" tool="3" flavor2="0">
       </item>
       <item path="parse/clean.sh" ex="false" tool="3" flavor2="0">
       </item>

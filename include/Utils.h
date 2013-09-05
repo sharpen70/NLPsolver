@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 #include "Vocabulary.h"
+#include "Rule.h"
 
 using namespace std;
 

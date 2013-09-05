@@ -7,6 +7,7 @@
 
 #include "DependenceGraph.h"
 #include "Utils.h"
+#include <cstring>
 
 DependenceGraph::DependenceGraph(vector<Rule> _nlp) :
                 nlp(_nlp) {

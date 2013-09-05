@@ -1,6 +1,7 @@
 #include "ClakeCompletion.h"
 #include "CNFUtils.h"
 #include "NNFUtils.h"
+#include "Utils.h"
 
 ClakeCompletion::ClakeCompletion() {
     no_ipf_atoms.clear();
@@ -39,7 +40,8 @@ vector<_formula*> ClakeCompletion::convert() {
         if(tr != NULL) {
             _formula* impl_l = Utils::compositeByConnective(IMPL, tl, tr);
             _formula* impl_r = Utils::compositeByConnective(IMPL, tr, tl);       
-
+            
+            
             Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_l));
             Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_r));
         }
@@ -48,7 +50,7 @@ vector<_formula*> ClakeCompletion::convert() {
         }
     }
     
-    for(vector<int>::iterator it = no_ipf_atoms.begin(); it != no_ipf_atoms.end;
+    for(vector<int>::iterator it = no_ipf_atoms.begin(); it != no_ipf_atoms.end();
             it++) {
         _formula* nega_atom = Utils::compositeByConnective(NEGA, Utils::compositeToAtom(
                 *it));
@@ -61,14 +63,17 @@ vector<_formula*> ClakeCompletion::convert() {
         _formula* fc = Utils::convertRuleBodyToFormula(*it);     
         
         fc = Utils::compositeByConnective(NEGA, fc);
-        Utils::joinFormulas(completion, NNFUtils::convertToNegativeNormalForm(fc));
+        vector<_formula*> joinf;
+        joinf.push_back(NNFUtils::convertToNegativeNormalForm(fc));
+        Utils::joinFormulas(completion, joinf);
     }
     
     return completion;
 }
 
 void ClakeCompletion::setDlp(const vector<Rule> nlp) {
-    for(vector<Rule>::iterator it = nlp.begin(); it != nlp.end(); it++) {
+    vector<Rule> _nlp = nlp;
+    for(vector<Rule>::iterator it = _nlp.begin(); it != _nlp.end(); it++) {
         int a = it->head;
         
         if(a > 0) {
@@ -110,4 +115,6 @@ void ClakeCompletion::test() {
     for(int i = 0; i < constrants.size(); i++) {
         constrants.at(i).output(stdout);
     }
+    
+    vector<_formula*> comp = convert();
 }

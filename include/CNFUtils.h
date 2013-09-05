@@ -16,9 +16,8 @@ using namespace std;
 class CNFUtils {
 public:
     static vector<_formula*> convertCNF(_formula* fml);
-private:
-    _formula* convertToConjuntiveNormalForm(_formula* fml);
-    void divideCNFFormula(_formula* fml, vector<_formula*>& division);
+    static _formula* convertToConjuntiveNormalForm(_formula* fml);
+    static void divideCNFFormula(_formula* fml, vector<_formula*>& division);
 };
 
 #endif	/* CNFUTILS_H */

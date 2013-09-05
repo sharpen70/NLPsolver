@@ -35,6 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/minisat/Constraints.o \
+	${OBJECTDIR}/minisat/Solver.o \
 	${OBJECTDIR}/src/CNFUtils.o \
 	${OBJECTDIR}/src/ClakeCompletion.o \
 	${OBJECTDIR}/src/DependenceGraph.o \
@@ -73,65 +75,75 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/nlpsolver: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/nlpsolver ${OBJECTFILES} ${LDLIBSOPTIONS}
 
+${OBJECTDIR}/minisat/Constraints.o: minisat/Constraints.C 
+	${MKDIR} -p ${OBJECTDIR}/minisat
+	${RM} $@.d
+	$(COMPILE.cc) -g -Iinclude -Iminisat -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/minisat/Constraints.o minisat/Constraints.C
+
+${OBJECTDIR}/minisat/Solver.o: minisat/Solver.C 
+	${MKDIR} -p ${OBJECTDIR}/minisat
+	${RM} $@.d
+	$(COMPILE.cc) -g -Iinclude -Iminisat -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/minisat/Solver.o minisat/Solver.C
+
 ${OBJECTDIR}/src/CNFUtils.o: src/CNFUtils.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CNFUtils.o src/CNFUtils.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CNFUtils.o src/CNFUtils.cpp
 
 ${OBJECTDIR}/src/ClakeCompletion.o: src/ClakeCompletion.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ClakeCompletion.o src/ClakeCompletion.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ClakeCompletion.o src/ClakeCompletion.cpp
 
 ${OBJECTDIR}/src/DependenceGraph.o: src/DependenceGraph.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/DependenceGraph.o src/DependenceGraph.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/DependenceGraph.o src/DependenceGraph.cpp
 
 ${OBJECTDIR}/src/NNFUtils.o: src/NNFUtils.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/NNFUtils.o src/NNFUtils.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/NNFUtils.o src/NNFUtils.cpp
 
 ${OBJECTDIR}/src/Rule.o: src/Rule.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Rule.o src/Rule.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Rule.o src/Rule.cpp
 
 ${OBJECTDIR}/src/SATSolver.o: src/SATSolver.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SATSolver.o src/SATSolver.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SATSolver.o src/SATSolver.cpp
 
 ${OBJECTDIR}/src/Utils.o: src/Utils.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Utils.o src/Utils.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Utils.o src/Utils.cpp
 
 ${OBJECTDIR}/src/Vocabulary.o: src/Vocabulary.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Vocabulary.o src/Vocabulary.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Vocabulary.o src/Vocabulary.cpp
 
 ${OBJECTDIR}/src/global.o: src/global.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/global.o src/global.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/global.o src/global.cpp
 
 ${OBJECTDIR}/src/lex.o: src/lex.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/lex.o src/lex.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/lex.o src/lex.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/main.o src/main.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/main.o src/main.cpp
 
 ${OBJECTDIR}/src/parse.o: src/parse.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/parse.o src/parse.cpp
+	$(COMPILE.cc) -g -Iinclude -Iminisat -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/parse.o src/parse.cpp
 
 # Subprojects
 .build-subprojects:

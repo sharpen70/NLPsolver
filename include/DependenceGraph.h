@@ -26,7 +26,7 @@ private:
     vector< vector<Rule> > extendSupportRulesForLoops;
     int visitedNodes[MAX_ATOM_NUMBER];
     
-    void dfsFind(int cur_node, int des_node);
+    void dfsFind(int cur_node, int des_node, vector<int> loop_atoms);
     void findESRules();
 };
 
