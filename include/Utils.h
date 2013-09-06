@@ -29,7 +29,7 @@ public:
     static _formula* compositeToAtom(int _atom_id);
     static vector<_formula*> convertCNF(_formula* head);
     
-    static void joinFormulas(vector<_formula*> des_list, vector<_formula*> join_list);
+    static vector<_formula*> joinFormulas(vector<_formula*> des_list, vector<_formula*> join_list);
     
     static bool inList(int tag, vector<int> list);
     static vector<int> divideListAt(int tag, vector<int> list);

@@ -27,14 +27,18 @@ vector<_formula*> ClakeCompletion::convert() {
             ipf_atoms_rules.end(); it++) {
         vector<Rule> ipf_rules = it->second;
         _formula* tl = Utils::compositeToAtom(it->first);
-        _formula* tr;
+        _formula* tr = NULL;
         
         for(vector<Rule>::iterator it = ipf_rules.begin(); it != ipf_rules.end();
                 it++) {
             _formula* fr = Utils::convertRuleBodyToFormula(*it);
             if(fr == NULL) break;
-            if(tr == NULL) tr = fr;
-            else tr = Utils::compositeByConnective(DISJ, tr, fr);
+            if(tr == NULL) {
+                tr = fr;
+            }
+            else {
+                tr = Utils::compositeByConnective(DISJ, tr, fr);
+            }
         }
         
         if(tr != NULL) {
@@ -42,8 +46,8 @@ vector<_formula*> ClakeCompletion::convert() {
             _formula* impl_r = Utils::compositeByConnective(IMPL, tr, tl);       
             
             
-            Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_l));
-            Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_r));
+            completion = Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_l));
+            completion = Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_r));
         }
         else {
             completion.push_back(tl);
@@ -99,6 +103,17 @@ void ClakeCompletion::setDlp(const vector<Rule> nlp) {
     } 
 }
 
+void ClakeCompletion::testCompletion() {
+    vector<_formula*> completion = convert();
+    vector< set<int> > res = Utils::convertToSATInput(completion);
+    
+    for(vector<set <int> >::iterator it = res.begin(); it != res.end(); it++) {
+        for(set<int>::iterator s_it = it->begin(); s_it != it->end(); s_it++) {
+            printf("%d ", *s_it);
+        }
+        printf("0\n");
+    }
+}
 void ClakeCompletion::test() {
     printf("\nno_ipf_atoms:");
     for(int i = 0; i < no_ipf_atoms.size(); i++) {
@@ -116,5 +131,5 @@ void ClakeCompletion::test() {
         constrants.at(i).output(stdout);
     }
     
-    vector<_formula*> comp = convert();
+    testCompletion();
 }

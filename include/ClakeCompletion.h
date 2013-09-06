@@ -20,5 +20,6 @@ public:
     vector<_formula*> convert();
     void setDlp(const vector<Rule> nlp);
     void test();
+    void testCompletion();
 };
 #endif

@@ -1,4 +1,4 @@
-#include "Utils.h"
+ #include "Utils.h"
 #include "Rule.h"
 #include <assert.h>
 #include <cstdlib>
@@ -71,10 +71,12 @@ bool Utils::crossList(vector<int> l1, vector<int> l2) {
     return false;
 }
 
-void Utils::joinFormulas(vector<_formula*> des_list, vector<_formula*> join_list) {
+vector<_formula*> Utils::joinFormulas(vector<_formula*> des_list, vector<_formula*> join_list) {
     for(int i = 0; i < join_list.size(); i++) {
         des_list.push_back(join_list.at(i));
     }
+    
+    return des_list;
 }
 
 vector< set<int> > Utils::convertToSATInput(vector<_formula*> cnfDlp) {
@@ -101,7 +103,7 @@ void Utils::convertCNFformulaToLits(_formula* rule, set<int>& lits) {
 }
 
 _formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
-    _formula* fml;
+    _formula* fml = NULL;
     
     Rule _rule(rule);
     
