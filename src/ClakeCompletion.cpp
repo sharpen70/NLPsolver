@@ -42,8 +42,10 @@ vector<_formula*> ClakeCompletion::convert() {
         }
         
         if(tr != NULL) {
-            _formula* impl_l = Utils::compositeByConnective(IMPL, tl, tr);
-            _formula* impl_r = Utils::compositeByConnective(IMPL, tr, tl);       
+            _formula* ntl = Utils::compositeByConnective(NEGA, Utils::copyFormula(tl));
+            _formula* ntr = Utils::compositeByConnective(NEGA, Utils::copyFormula(tr));
+            _formula* impl_l = Utils::compositeByConnective(DISJ, ntl, tr);
+            _formula* impl_r = Utils::compositeByConnective(DISJ, ntr, tl);       
             
             
             completion = Utils::joinFormulas(completion, CNFUtils::convertCNF(impl_l));

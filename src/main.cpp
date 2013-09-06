@@ -11,6 +11,8 @@
 #include "Vocabulary.h"
 #include "structs.h"
 #include "ClakeCompletion.h"
+#include "SATSolver.h"
+#include <set>
 #include <iostream>
 #include <unistd.h>
 
@@ -53,7 +55,12 @@ int main(int argc, char** argv) {
     }
 //    Vocabulary::instance().dumpVocabulary(stdout);
     ClakeCompletion::instance().setDlp(G_NLP);
-    ClakeCompletion::instance().test();
+    vector<_formula*> completion = ClakeCompletion::instance().convert();
+    vector< set<int> > satin = Utils::convertToSATInput(completion);
+    
+    SATSolver sats(satin, Vocabulary::instance().apSize());
+    sats.invokeSAT();
+    sats.outputResult();
 //    
 //    Formula f = Formula(gformula, true);
 //    PriCircTranslator* pct = new PriCircTranslator();

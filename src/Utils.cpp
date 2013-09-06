@@ -40,6 +40,63 @@ _formula* Utils::compositeToAtom(int _atom_id) {
     return fml;
 }
 
+_formula* Utils::copyFormula(const _formula* _fml) {
+    if (_fml == NULL) {
+        return NULL;
+    }
+	
+    _formula* newFormula = (_formula*)malloc(sizeof(_formula));
+    assert (newFormula);
+
+    memcpy(newFormula, _fml, sizeof(_formula));
+    switch (_fml->formula_type)
+    {
+    case ATOM:
+        newFormula->predicate_id = _fml->predicate_id;
+        break;
+    case CONJ:
+    case DISJ:
+    case IMPL:
+        assert(_fml->subformula_r);
+        newFormula->subformula_r = copyFormula( _fml->subformula_r);
+    case NEGA:
+    case UNIV:
+    case EXIS:
+        assert(_fml->subformula_l);
+        newFormula->subformula_l = copyFormula(_fml->subformula_l);
+        break;
+    default:
+        assert (0);
+    }
+
+    return newFormula;
+}
+
+void Utils::deleteFormula(_formula* _fml) {
+    assert(_fml);
+
+    switch (_fml->formula_type)
+    {
+    case ATOM:
+        break;
+    case CONJ:
+    case DISJ:
+    case IMPL:
+        assert(_fml->subformula_r);
+        deleteFormula(_fml->subformula_r);
+    case NEGA:
+    case UNIV:
+    case EXIS:
+        assert(_fml->subformula_l);
+        deleteFormula(_fml->subformula_l);
+        break;
+    default:
+        assert ( 0 );
+    }
+
+    free(_fml);
+}
+
 bool Utils::inList(int tag, vector<int> list) {
     for(int i = 0; i < list.size(); i++) {
         if(tag == list.at(i)) return true;       
@@ -85,6 +142,8 @@ vector< set<int> > Utils::convertToSATInput(vector<_formula*> cnfDlp) {
         set<int> lits;
         convertCNFformulaToLits(*it, lits);
         res.push_back(lits);
+        
+        deleteFormula(*it);
     }
     return res;
 }

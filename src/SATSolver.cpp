@@ -6,6 +6,7 @@
  */
 
 #include "SATSolver.h"
+#include "Vocabulary.h"
 
 SATSolver::SATSolver(vector< set<int> > cnf, int num_lits) {
     num_lits_in_NLP = num_lits;
@@ -61,10 +62,24 @@ bool SATSolver::isExistModel() {
             }
         }
         sat.addClause(new_clause);
-        
+        models.push_back(model_set);
         return true;
     }
     else {
         return false;
+    }
+}
+
+void SATSolver::outputResult() {
+    int i = 1;
+    
+    for(vector< set<int> >::iterator s_it = models.begin(); s_it != models.end();
+            s_it++) {
+        printf("Model %d:\n", i);
+        i++;
+        for(set<int>::iterator m_it = s_it->begin(); m_it != s_it->end(); m_it++) {
+            printf("%s", Vocabulary::instance().getAtom(*m_it));
+        }
+        printf("\n");
     }
 }

@@ -9,7 +9,7 @@
 #include "Utils.h"
 #include "NNFUtils.h"
 
-vector<_formula*> CNFUtils::convertCNF(_formula* fml) {
+vector<_formula*> CNFUtils::convertCNF(_formula*& fml) {
     NNFUtils::convertToNegativeNormalForm(fml);
     convertToConjuntiveNormalForm(fml);
     
@@ -19,7 +19,7 @@ vector<_formula*> CNFUtils::convertCNF(_formula* fml) {
     return result;
 }
 
-_formula* CNFUtils::convertToConjuntiveNormalForm(_formula* fml) {
+_formula* CNFUtils::convertToConjuntiveNormalForm(_formula*& fml) {
     if(fml->formula_type == DISJ) {
         convertToConjuntiveNormalForm(fml->subformula_l);
         convertToConjuntiveNormalForm(fml->subformula_r);
@@ -33,11 +33,11 @@ _formula* CNFUtils::convertToConjuntiveNormalForm(_formula* fml) {
                 _formula* f1 = Utils::compositeByConnective(DISJ, subfor_l->subformula_l, 
                         subfor_r->subformula_l);
                 _formula* f2 = Utils::compositeByConnective(DISJ, subfor_l->subformula_r,
-                        subfor_r->subformula_l);
-                _formula* f3 = Utils::compositeByConnective(DISJ, subfor_l->subformula_l,
+                        Utils::copyFormula(subfor_r->subformula_l));
+                _formula* f3 = Utils::compositeByConnective(DISJ, Utils::copyFormula(subfor_l->subformula_l),
                         subfor_r->subformula_r);
-                _formula* f4 = Utils::compositeByConnective(DISJ, subfor_l->subformula_r,
-                        subfor_r->subformula_r);
+                _formula* f4 = Utils::compositeByConnective(DISJ, Utils::copyFormula(subfor_l->subformula_r),
+                        Utils::copyFormula(subfor_r->subformula_r));
                 
                 _formula* f12 = Utils::compositeByConnective(CONJ, f1, f2);
                 _formula* f34 = Utils::compositeByConnective(CONJ, f3, f4);
@@ -52,7 +52,7 @@ _formula* CNFUtils::convertToConjuntiveNormalForm(_formula* fml) {
                     subfor_r = fml->subformula_r;
                 }
                 _formula* f1 = Utils::compositeByConnective(DISJ, subfor_l->subformula_l, subfor_r);
-                _formula* f2 = Utils::compositeByConnective(DISJ, subfor_l->subformula_r, subfor_l);
+                _formula* f2 = Utils::compositeByConnective(DISJ, subfor_l->subformula_r, Utils::copyFormula(subfor_r));
                 
                 fml = Utils::compositeByConnective(CONJ, f1, f2);
             }
