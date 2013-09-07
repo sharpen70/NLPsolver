@@ -192,18 +192,20 @@ _formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
 
 vector<int> Utils::readClaspAnswers(const char* AnswerSet_list) {
     FILE* asl = fopen(AnswerSet_list, "r");
-    cout << "AnswerSet_list : " << AnswerSet_list << endl;
     vector<int> numberOfAnswerSet;
     int max_line = 1000;
     
     while(!feof(asl)) {
         char as[max_line];
-        fgets(as, max_line, asl);
-        cout << "as : " << as << endl;
-        fgetc(asl);
+        fgets(as, max_line, asl);     
+        int asi = 0;
+        while(as[asi] != '\n')
+            asi++;
+        as[asi] = '\0';
+
         FILE* fas = fopen(as, "r");
         if(fas == NULL)
-            cout << "WTF" << endl;
+            cout << "Open as failed.\n";
         char match[] = "Models";
         int index = 0;
         

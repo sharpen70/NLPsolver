@@ -56,7 +56,6 @@ int main(int argc, char** argv) {
 //    fclose(yyin);
     
     //The model number for each benchmark running with ASP solver.
-    cout << "dddddd" << endl;
     vector<int> aspResult = Utils::readClaspAnswers("res/output/aspOutput.out");
     cout << aspResult.size() << endl;
     
@@ -68,12 +67,9 @@ int main(int argc, char** argv) {
         istringstream inf(text);
         inf >> in >> out;
         
-        cout << in << "   " << out << endl;
-        
         io(in.c_str(), out.c_str());
         yyparse();
         fclose(yyin);
-    
     
         for(int i = 0; i < G_NLP.size(); i++) {
             G_NLP.at(i).output(stdout);
@@ -113,11 +109,12 @@ int main(int argc, char** argv) {
 
             //Compare with ASP solver
             if(numModel == aspResult.at(aspr)) {
-                printf("\nThe k is %d\n", *kit);
+                printf("\nThe k is %d\n\n", *kit);
                 break;
             }
-        }
-          
+       }
+       
+       G_NLP.clear();   
     }
     
     infile.close();
