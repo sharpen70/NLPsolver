@@ -41,6 +41,8 @@ public:
     static void convertCNFformulaToLits(_formula* rule, set<int>& lits);
     
     static _formula* convertRuleBodyToFormula(const Rule& rule);
+    
+    static vector<int> readClaspAnswers(const char* AnswerSet_list);
 };
 
 

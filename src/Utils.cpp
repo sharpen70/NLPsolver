@@ -186,3 +186,50 @@ _formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
     
     return fml;
 }
+
+vector<int> Utils::readClaspAnswers(const char* AnswerSet_list) {
+    FILE* asl = fopen(AnswerSet_list, "r");
+    vector<int> numberOfAnswerSet;
+    int max_line = 1000;
+    
+    while(!feof(asl)) {
+        char as[max_line];
+        fgets(as, max_line, asl);
+        fgetc(asl);
+        FILE* fas = fopen(as, "r");
+        char match[] = "models";
+        int index = 0;
+        
+        while(!feof(fas)) {
+            
+            char c = fgetc(fas);
+
+            if(c == match[index]) {
+                index++;
+            }
+            else {
+                index = 0;
+            }
+            if(match[index] == '\0') break;
+        }
+        
+        int number = 0;
+        char digit = fgetc(fas);
+
+        while(!isdigit(digit)) {
+            digit = fgetc(fas);
+        }
+
+        while(isdigit(digit)) {
+            number = 10 * number + (digit - '0');
+            digit = fgetc(fas);
+        }
+        numberOfAnswerSet.push_back(number);
+        
+        
+        fclose(fas);
+    }
+    fclose(asl);
+    
+    return numberOfAnswerSet;
+}
