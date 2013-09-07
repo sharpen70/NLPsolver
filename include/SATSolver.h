@@ -19,7 +19,8 @@ public:
     SATSolver(const SATSolver& orig);
     ~SATSolver();
     
-    void invokeSAT();
+//    void invokeSAT();
+    int invokeSAT();
     void outputResult();
     vector< set<int> > models;
     

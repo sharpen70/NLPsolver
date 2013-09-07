@@ -3,6 +3,9 @@
 #include <assert.h>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
+
+using namespace std;
 
 /**
  * 使用联接词(非、析取、合取、蕴含)生成公式
@@ -189,15 +192,19 @@ _formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
 
 vector<int> Utils::readClaspAnswers(const char* AnswerSet_list) {
     FILE* asl = fopen(AnswerSet_list, "r");
+    cout << "AnswerSet_list : " << AnswerSet_list << endl;
     vector<int> numberOfAnswerSet;
     int max_line = 1000;
     
     while(!feof(asl)) {
         char as[max_line];
         fgets(as, max_line, asl);
+        cout << "as : " << as << endl;
         fgetc(asl);
         FILE* fas = fopen(as, "r");
-        char match[] = "models";
+        if(fas == NULL)
+            cout << "WTF" << endl;
+        char match[] = "Models";
         int index = 0;
         
         while(!feof(fas)) {
@@ -232,4 +239,58 @@ vector<int> Utils::readClaspAnswers(const char* AnswerSet_list) {
     fclose(asl);
     
     return numberOfAnswerSet;
+}
+
+void Utils::formulaOutput(FILE* out, const _formula* fml) {
+    assert(fml);
+    
+    _formula* output = copyFormula(fml);
+    
+    switch(output->formula_type) {
+        case ATOM:
+            fprintf(out, "%s", Vocabulary::instance().getAtom(output->predicate_id));
+            break;
+        case CONJ:
+            assert(output->subformula_l);
+            fprintf(out, "(");
+            formulaOutput(out, output->subformula_l);
+            fprintf(out, " & ");
+            assert(output->subformula_r);
+            formulaOutput(out, output->subformula_r);
+            fprintf(out, ")");
+            break;
+        case DISJ:
+            assert(output->subformula_l);
+            fprintf(out, "(");
+            formulaOutput(out, output->subformula_l);
+            fprintf(out, " | ");
+            assert(output->subformula_r);
+            formulaOutput(out, output->subformula_r);
+            fprintf(out, ")");
+            break;
+        case IMPL:
+            assert(output->subformula_l);
+            fprintf(out, "(");
+            formulaOutput(out, output->subformula_l);
+            fprintf(out, " -> ");
+            assert(output->subformula_r);
+            formulaOutput(out, output->subformula_r);
+            fprintf(out, ")");
+            break;
+        case NEGA:   
+            fprintf(out, " not (");
+            assert(output->subformula_l);
+            formulaOutput(out, output->subformula_l);
+            fprintf(out, ")");
+            break;
+        case UNIV:
+        case EXIS:
+            assert(output->subformula_l);
+            formulaOutput(out, output->subformula_l);
+            break;
+        default:
+            assert(0);
+    }
+    
+    free(output);
 }

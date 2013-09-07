@@ -4,5 +4,3 @@ a :- not c.
 c :- d.
 d :- c.
 c :- not a.
-c :- e.
-

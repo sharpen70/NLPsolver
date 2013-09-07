@@ -40,8 +40,11 @@ SATSolver::SATSolver(vector< set<int> > cnf, int num_lits) {
 SATSolver::~SATSolver() {
 }
 
-void SATSolver::invokeSAT() {
-    while(isExistModel());
+int SATSolver::invokeSAT() {
+    int i = 0;
+    while(isExistModel())
+        i++;
+    return i;
 }
 
 bool SATSolver::isExistModel() {

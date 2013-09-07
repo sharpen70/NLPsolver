@@ -30,6 +30,7 @@ public:
     static _formula* copyFormula(const _formula* _fml);
     static void deleteFormula(_formula* _fml);
     
+    static void formulaOutput(FILE* out, const _formula* fml);
     
     static vector<_formula*> joinFormulas(vector<_formula*> des_list, vector<_formula*> join_list);
     

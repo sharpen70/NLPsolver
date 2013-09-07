@@ -41,6 +41,8 @@
         <itemPath>res/input/sample.in</itemPath>
       </logicalFolder>
       <logicalFolder name="output" displayName="output" projectFiles="true">
+        <itemPath>res/output/aspOutput.out</itemPath>
+        <itemPath>res/output/benchmark1.out</itemPath>
         <itemPath>res/output/sample.out</itemPath>
       </logicalFolder>
     </logicalFolder>
@@ -162,6 +164,10 @@
       </item>
       <item path="res/input/sample.in" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="res/output/aspOutput.out" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/output/benchmark1.out" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="res/output/sample.out" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/CNFUtils.cpp" ex="false" tool="1" flavor2="0">
@@ -263,6 +269,10 @@
       <item path="parse/parse.y" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/input/sample.in" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/output/aspOutput.out" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/output/benchmark1.out" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/output/sample.out" ex="false" tool="3" flavor2="0">
       </item>

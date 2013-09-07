@@ -51,7 +51,7 @@ class Solver {
 //protected:
 public:
     bool                ok;             // If FALSE, the constraints are already unsatisfiable. No part of the solver state may be used!
-	bool                doDeriv;	    // If TRUE, this solver will compute a derivation (unsat core)
+    bool                doDeriv;	    // If TRUE, this solver will compute a derivation (unsat core)
     vec<Constr*>        constrs;        // List of problem constraints.
     vec<Clause*>        learnts;        // List of learnt clauses.
     double              cla_inc;        // Amount to bump next clause with.

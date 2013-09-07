@@ -17,13 +17,21 @@ public:
     DependenceGraph(vector<Rule> _dlp);
     DependenceGraph(const DependenceGraph& orig);
     ~DependenceGraph();
-    void DFSFindLoops();
-    void BFSFindLoops();
+    void DFSFindLoops();        //find loop
+    void BFSFindLoops();        //null
+    
+    void test();                //nonsense, just for test
+    
+    vector<_formula*> computeLoopFormulas();
+    vector<_formula*> getExtendSupportRulesWithSize(int k);
+    vector<int> getESRSizes();
+    
 private:
     vector<Rule> nlp;
     map<int, vector<int> > dpdGraph;
     vector< vector<int> > loops;
     vector< vector<Rule> > extendSupportRulesForLoops;
+    map<int, vector<_formula*> > extendSupportRulesWithSize;   //map[k] = esr (size(esr) = k)
     int visitedNodes[MAX_ATOM_NUMBER];
     
     void dfsFind(int cur_node, int des_node, vector<int> loop_atoms);
@@ -31,4 +39,3 @@ private:
 };
 
 #endif	/* DEPENDENCEGRAPH_H */
-
