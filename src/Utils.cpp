@@ -190,9 +190,9 @@ _formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
     return fml;
 }
 
-vector<int> Utils::readClaspAnswers(const char* AnswerSet_list) {
+vector< vector< vector<string> > > Utils::readClaspAnswers(const char* AnswerSet_list) {
     FILE* asl = fopen(AnswerSet_list, "r");
-    vector<int> numberOfAnswerSet;
+    vector< vector< vector<string> > > claspAnswers;
     int max_line = 1000;
     
     while(!feof(asl)) {
@@ -202,45 +202,64 @@ vector<int> Utils::readClaspAnswers(const char* AnswerSet_list) {
         while(as[asi] != '\n')
             asi++;
         as[asi] = '\0';
-
-        FILE* fas = fopen(as, "r");
-        if(fas == NULL)
-            cout << "Open as failed.\n";
-        char match[] = "Models";
-        int index = 0;
         
-        while(!feof(fas)) {
-            
-            char c = fgetc(fas);
-
-            if(c == match[index]) {
-                index++;
-            }
-            else {
-                index = 0;
-            }
-            if(match[index] == '\0') break;
-        }
-        
-        int number = 0;
-        char digit = fgetc(fas);
-
-        while(!isdigit(digit)) {
-            digit = fgetc(fas);
-        }
-
-        while(isdigit(digit)) {
-            number = 10 * number + (digit - '0');
-            digit = fgetc(fas);
-        }
-        numberOfAnswerSet.push_back(number);
-        
-        
-        fclose(fas);
+        claspAnswers.push_back(readClaspAnswer(as));        
     }
     fclose(asl);
     
-    return numberOfAnswerSet;
+    return claspAnswers;
+}
+
+vector< vector<string> > Utils::readClaspAnswer(const char* answer) {
+    vector< vector<string> > model_answer;
+    FILE* fas = fopen(answer, "r");
+    if(fas == NULL) cout << "Open as failed.\n";
+    
+    char answer_match[] = "Answer";
+    int index = 0;
+    
+    while(!feof(fas)) {
+        char c = fgetc(fas);
+
+        if(c == answer_match[index]) {
+            index++;
+        }
+        else {
+            index = 0;
+        }
+        
+        if(answer_match[index] == '\0') {
+            vector<string> model;
+            
+            while(fgetc(fas) != '\n');
+            
+            while(true) {
+                char m[MAX_ATOM_LENGTH];
+                int mi = 0;
+                char tmp = fgetc(fas);
+                
+                if(tmp == '\n') break;
+                
+                while(tmp != ' ' && tmp != '\n') {
+                    m[mi] = tmp;
+                    mi++;
+                    tmp = fgetc(fas);
+                }
+                m[mi] = '\0';
+                
+                string ms(m);
+                model.push_back(ms);
+                
+                if(tmp == '\n') break;
+            }
+            index = 0;
+            model_answer.push_back(model);
+        }       
+    }
+
+    fclose(fas);  
+    
+    return model_answer;
 }
 
 void Utils::formulaOutput(FILE* out, const _formula* fml) {

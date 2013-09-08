@@ -43,7 +43,8 @@ public:
     
     static _formula* convertRuleBodyToFormula(const Rule& rule);
     
-    static vector<int> readClaspAnswers(const char* AnswerSet_list);
+    static vector< vector< vector<string> > > readClaspAnswers(const char* AnswerSet_list);
+    static vector< vector<string> > readClaspAnswer(const char* answer);
 };
 
 
