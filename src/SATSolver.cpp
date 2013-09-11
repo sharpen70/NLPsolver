@@ -63,9 +63,12 @@ bool SATSolver::isExistModel() {
             else {
                 new_clause.push(Lit(i));
             }
-        }
-        sat.addClause(new_clause);
+        }        
         models.push_back(model_set);
+        
+        if(!sat.addClause(new_clause)) {
+            return false;
+        }
         return true;
     }
     else {

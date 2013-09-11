@@ -8,10 +8,11 @@
 #include "CNFUtils.h"
 #include "Utils.h"
 #include "NNFUtils.h"
+#include <assert.h>
 
 vector<_formula*> CNFUtils::convertCNF(_formula*& fml) {
-    NNFUtils::convertToNegativeNormalForm(fml);
-    convertToConjuntiveNormalForm(fml);
+    fml = NNFUtils::convertToNegativeNormalForm(fml);
+    fml = convertToConjuntiveNormalForm(fml);
     
     vector<_formula*> result;
     divideCNFFormula(fml, result);
@@ -19,6 +20,55 @@ vector<_formula*> CNFUtils::convertCNF(_formula*& fml) {
     return result;
 }
 
+_formula* CNFUtils::convertToNegativeNormalForm(_formula*& fml) {
+    assert(fml->formula_type);
+    
+    if(fml->formula_type == ATOM) {
+        return fml;
+    }
+    else if(fml->formula_type == CONJ || fml->formula_type == UNIV) {
+        convertToNegativeNormalForm(fml->subformula_l);
+        convertToNegativeNormalForm(fml->subformula_r);
+    }
+    else if(fml->formula_type == NEGA) {
+        if(fml->subformula_l->formula_type == ATOM) return fml;
+        else if(fml->subformula_l->formula_type == NEGA) {
+            _formula* gs = fml->subformula_l->subformula_l;
+            
+            fml->formula_type = gs->formula_type;
+            
+            if(gs->formula_type == CONJ || gs->formula_type == DISJ) {
+                free(fml->subformula_l);
+                fml->subformula_l = gs->subformula_l;
+                fml->subformula_r = gs->subformula_r;
+                free(gs);
+            }
+            else if(gs->formula_type == NEGA) {
+                free(fml->subformula_l);
+                fml->subformula_l = gs->subformula_l;
+                free(gs);
+            }
+            else {
+                free(fml->subformula_l);
+                fml->predicate_id = gs->predicate_id;
+                free(gs);
+            }
+            
+            convertToNegativeNormalForm(fml);           
+        }
+        else {
+            FORMULA_TYPE type = (fml->subformula_l->formula_type == CONJ) ? UNIV : CONJ;
+            fml->formula_type = type;
+            fml->subformula_l = Utils::compositeByConnective(NEGA, fml->subformula_l);
+            fml->subformula_r = Utils::compositeByConnective(NEGA, fml->subformula_r);
+
+            convertToNegativeNormalForm(fml->subformula_l);
+            convertToNegativeNormalForm(fml->subformula_r);
+        }
+    }
+    
+    return fml;
+}
 _formula* CNFUtils::convertToConjuntiveNormalForm(_formula*& fml) {
     if(fml->formula_type == DISJ) {
         convertToConjuntiveNormalForm(fml->subformula_l);

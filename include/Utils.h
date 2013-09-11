@@ -43,8 +43,15 @@ public:
     
     static _formula* convertRuleBodyToFormula(const Rule& rule);
     
-    static vector< vector< vector<string> > > readClaspAnswers(const char* AnswerSet_list);
-    static vector< vector<string> > readClaspAnswer(const char* answer);
+    static vector< vector< vector<char*> > > readClaspAnswers(const char* AnswerSet_list);
+    static vector< vector<char*> > readClaspAnswer(const char* answer);
+    
+    static bool charCmp(char* a, char* b);
+    static bool ModelCharCmp(vector<char*>& a, vector<char*>& b);
+    
+    static bool compareSingleModel(vector<char*>& claspModel, set<int>& satModel);
+    static bool compareAnswerSet(vector< vector<char*> >& claspAnswer, vector< set<int> >& satAnswer);
+    
 };
 
 

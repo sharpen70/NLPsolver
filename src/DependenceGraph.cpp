@@ -91,16 +91,18 @@ void DependenceGraph::findESRules() {
     
     for(int i = 0; i < loops.size(); i++) {
         vector<Rule> esr;
-        for(vector<Rule>::iterator r = _nlp.begin(); r != _nlp.end();) {
+        for(vector<Rule>::iterator r = _nlp.begin(); r != _nlp.end(); r++) {
 //            if(!(Utils::crossList(loops.at(i), r->positive_literals)
 //                    || Utils::crossList(loops.at(i), r->negative_literals))) {
+            if(r->body_length == 0) {
+                continue;
+            }
             if(Utils::inList(r->head, loops.at(i)) && 
                     (!(Utils::crossList(r->positive_literals, loops.at(i))) && 
                     !(Utils::crossList(r->negative_literals, loops.at(i))))) {
                 esr.push_back(*r);
-                r = _nlp.erase(r);               
+               // r = _nlp.erase(r);               
             }
-            else r++;
         }
         extendSupportRulesForLoops.push_back(esr);
     }
@@ -215,7 +217,7 @@ vector<_formula*> DependenceGraph::computeLoopFormulas() {
         _formula* _head = Utils::compositeToAtom(*((*it).begin()));
         for(vector<int>::iterator hit = (*it).begin()+1;
                 hit != (*it).end(); hit++) {        
-            _head = Utils::compositeByConnective(DISJ, _head
+            _head = Utils::compositeByConnective(CONJ, _head
                     , Utils::compositeToAtom(*hit));
         }
         head.push_back(Utils::copyFormula(_head));
@@ -228,20 +230,32 @@ vector<_formula*> DependenceGraph::computeLoopFormulas() {
                 bit != extendSupportRulesForLoops.end(); bit++) {  
         k.insert((*bit).size());
         
-        _formula* _body = Utils::convertRuleBodyToFormula(*((*bit).begin()));
-        for(vector<Rule>::iterator rit = (*bit).begin()+1; rit != (*bit).end(); rit++) {       
-            _body = Utils::compositeByConnective(DISJ, _body, 
-                                        Utils::convertRuleBodyToFormula(*rit));         
-        }       
-        body.push_back(Utils::copyFormula(_body));       
-        Utils::deleteFormula(_body);
-        
+        if(bit->size() == 0) {
+            _formula* _body = Utils::compositeToAtom(-1);
+            body.push_back(_body);
+        }
+        else {
+            _formula* _body = Utils::convertRuleBodyToFormula(*((*bit).begin()));
+            for(vector<Rule>::iterator rit = (*bit).begin()+1; rit != (*bit).end(); rit++) {       
+                _body = Utils::compositeByConnective(DISJ, _body, 
+                                            Utils::convertRuleBodyToFormula(*rit));         
+            }       
+            body.push_back(Utils::copyFormula(_body));       
+            Utils::deleteFormula(_body);
+        }
     }
     
     //loop formula
     for(int i = 0; i < head.size(); i++) {
+        _formula* lf;
+        
         _formula* nhead = Utils::compositeByConnective(NEGA, head.at(i), NULL);
-        _formula* lf = Utils::compositeByConnective(DISJ, nhead, body.at(i));
+        if(body.at(i)->formula_type == ATOM && body.at(i)->predicate_id == -1) {
+            lf = nhead;           
+        }
+        else {
+            lf = Utils::compositeByConnective(DISJ, nhead, body.at(i));
+        }
         loopformulas.push_back(Utils::copyFormula(lf));
         Utils::deleteFormula(lf);
     }

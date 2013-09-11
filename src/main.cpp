@@ -54,20 +54,29 @@ int main(int argc, char** argv) {
 //    
 //    yyparse();
 //    fclose(yyin);
+    vector< vector<char*> > aspResult = Utils::readClaspAnswer("res/output/benchmark1.out");
+    
+    for(vector< vector<char*> >::iterator it = aspResult.begin(); it != aspResult.end(); it++) {
+        for(vector<char*>::iterator c_it = it->begin(); c_it != it->end(); c_it++) {
+            printf("%s ", *c_it);
+        }
+        printf("\n");
+    }
     
     //The model number for each benchmark running with ASP solver.
-    vector<int> aspResult = Utils::readClaspAnswers("res/output/aspOutput.out");
+//    vector<int> aspResult = Utils::readClaspAnswers("res/output/aspOutput.out");
     cout << aspResult.size() << endl;
     
-    ifstream infile("res/input/IOFile.in");
-    string text, in, out;
-    
-    for(int aspr = 0; aspr < aspResult.size(); aspr++) {
-        getline(infile, text);
-        istringstream inf(text);
-        inf >> in >> out;
-        
-        io(in.c_str(), out.c_str());
+//    ifstream infile("res/input/IOFile.in");
+//    string text, in, out;
+//    
+//    for(int aspr = 0; aspr < aspResult.size(); aspr++) {
+//        getline(infile, text);
+//        istringstream inf(text);
+//        inf >> in >> out;
+//        
+//        io(in.c_str(), out.c_str());
+        yyin = fopen("res/input/sample.in", "r");
         yyparse();
         fclose(yyin);
     
@@ -82,42 +91,61 @@ int main(int argc, char** argv) {
         //Completion  
         ClakeCompletion::instance().setDlp(G_NLP);
         vector<_formula*> completion = ClakeCompletion::instance().convert();
-
+        vector< set<int> > input = Utils::convertToSATInput(completion);
+        //ClakeCompletion::instance().testCompletion();
+        for(vector< set<int> >::iterator it = input.begin(); it != input.end(); it++) {
+            for(set<int>::iterator t = it->begin(); t != it->end(); t++) {
+                printf("%d ", *t);
+            }
+            printf("\n");
+        }
+        SATSolver sat(input, Vocabulary::instance().apSize());
+        sat.invokeSAT();
+        sat.outputResult();
         DependenceGraph dpg(G_NLP);
+       // dpg.test();
         vector<_formula*> loopformulas = dpg.computeLoopFormulas();
         vector<int> k = dpg.getESRSizes();
 
         //LoopFormulas from k = 0 to N
         for(vector<int>::iterator kit = k.begin(); kit != k.end(); kit++) {
             vector<_formula*> addLoopFormulas = dpg.getExtendSupportRulesWithSize(*kit);
-
-            vector<_formula*> _input = Utils::joinFormulas(completion, addLoopFormulas);
+            for(vector<_formula*>::iterator it = addLoopFormulas.begin(); it != addLoopFormulas.end(); it++) {
+                vector<_formula*> c = CNFUtils::convertCNF(*it);
+                for(vector<_formula*>::iterator c_it = c.begin(); c_it != c.end(); c_it++) {
+                    set<int>  lits;
+                    Utils::convertCNFformulaToLits(*c_it, lits);
+                    input.push_back(lits);
+                }
+            }
+            fflush(stdout);
+           // vector<_formula*> input = Utils::joinFormulas(completion, addLoopFormulas);
 
             //CNF before the sat input
-            vector<_formula*> input;
-            for(vector<_formula*>::iterator it = _input.begin(); it != _input.end(); it++) {
-                vector<_formula*> tmp = CNFUtils::convertCNF(*it);
-                input = Utils::joinFormulas(input, tmp);
-            }
+//            vector<_formula*> input;
+//            for(vector<_formula*>::iterator it = _input.begin(); it != _input.end(); it++) {
+//                vector<_formula*> tmp = CNFUtils::convertCNF(*it);
+//                input = Utils::joinFormulas(input, tmp);
+//            }
 
             //Use SAT to compute the models
-            vector< set<int> > satin = Utils::convertToSATInput(input);
+            //vector< set<int> > satin = Utils::convertToSATInput(completion);
 
-            SATSolver sats(satin, Vocabulary::instance().apSize());
-            int numModel = sats.invokeSAT();
+            SATSolver sats(input, Vocabulary::instance().apSize());
+            sats.invokeSAT();
             sats.outputResult();
 
             //Compare with ASP solver
-            if(numModel == aspResult.at(aspr)) {
+            if(Utils::compareAnswerSet(aspResult, sats.models)) {
                 printf("\nThe k is %d\n\n", *kit);
                 break;
             }
        }
        
        G_NLP.clear();   
-    }
+    //}
     
-    infile.close();
+   // infile.close();
     
     return 0;
 }

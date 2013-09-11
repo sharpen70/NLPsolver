@@ -18,6 +18,7 @@ public:
     static vector<_formula*> convertCNF(_formula*& fml);
     static _formula* convertToConjuntiveNormalForm(_formula*& fml);
     static void divideCNFFormula(_formula* fml, vector<_formula*>& division);
+    static _formula* convertToNegativeNormalForm(_formula*& fml);
 };
 
 #endif	/* CNFUTILS_H */

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -190,9 +191,9 @@ _formula* Utils::convertRuleBodyToFormula(const Rule& rule) {
     return fml;
 }
 
-vector< vector< vector<string> > > Utils::readClaspAnswers(const char* AnswerSet_list) {
+vector< vector< vector<char*> > > Utils::readClaspAnswers(const char* AnswerSet_list) {
     FILE* asl = fopen(AnswerSet_list, "r");
-    vector< vector< vector<string> > > claspAnswers;
+    vector< vector< vector<char*> > > claspAnswers;
     int max_line = 1000;
     
     while(!feof(asl)) {
@@ -210,8 +211,8 @@ vector< vector< vector<string> > > Utils::readClaspAnswers(const char* AnswerSet
     return claspAnswers;
 }
 
-vector< vector<string> > Utils::readClaspAnswer(const char* answer) {
-    vector< vector<string> > model_answer;
+vector< vector<char*> > Utils::readClaspAnswer(const char* answer) {
+    vector< vector<char*> > model_answer;
     FILE* fas = fopen(answer, "r");
     if(fas == NULL) cout << "Open as failed.\n";
     
@@ -229,7 +230,7 @@ vector< vector<string> > Utils::readClaspAnswer(const char* answer) {
         }
         
         if(answer_match[index] == '\0') {
-            vector<string> model;
+            vector<char*> model;
             
             while(fgetc(fas) != '\n');
             
@@ -247,8 +248,7 @@ vector< vector<string> > Utils::readClaspAnswer(const char* answer) {
                 }
                 m[mi] = '\0';
                 
-                string ms(m);
-                model.push_back(ms);
+                model.push_back(strdup(m));
                 
                 if(tmp == '\n') break;
             }
@@ -314,4 +314,48 @@ void Utils::formulaOutput(FILE* out, const _formula* fml) {
     }
     
     free(output);
+}
+
+bool Utils::charCmp(char* a, char* b) {
+    if(strcmp(a, b) < 0) return true;
+    else return false;
+}
+
+bool Utils::compareSingleModel(vector<char*>& claspModel, set<int>& satModel) {
+    vector<char*> satCharModel;
+    
+    if(satModel.size() != claspModel.size()) return false;
+    
+    for(set<int>::iterator it = satModel.begin(); it != satModel.end(); it++) {
+        satCharModel.push_back(Vocabulary::instance().getAtom(*it));
+    }
+    
+    sort(claspModel.begin(), claspModel.end(), charCmp);
+    sort(satCharModel.begin(), satCharModel.end(), charCmp);
+    
+    for(int i = 0; i < satModel.size(); i++) {
+        if(strcmp(satCharModel.at(i), claspModel.at(i)) != 0)
+            return false;
+    }
+    
+    return true;
+}
+
+bool Utils::compareAnswerSet(vector< vector<char*> >& claspAnswer, vector< set<int> >& satAnswer) {
+    if(claspAnswer.size() != satAnswer.size()) return false;
+    
+    for(vector< vector<char*> >::iterator c_it = claspAnswer.begin(); c_it != claspAnswer.end(); 
+            c_it++) {
+        bool exis = false;
+        for(vector< set<int> >::iterator s_it = satAnswer.begin(); s_it != satAnswer.end();
+                s_it++) {
+            if(compareSingleModel(*c_it, *s_it)) {
+                exis = true;
+                break;
+            }
+        }
+        if(!exis) return false;
+    }
+    
+    return true;
 }

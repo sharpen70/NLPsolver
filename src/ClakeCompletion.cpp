@@ -31,6 +31,11 @@ vector<_formula*> ClakeCompletion::convert() {
         
         for(vector<Rule>::iterator it = ipf_rules.begin(); it != ipf_rules.end();
                 it++) {
+            
+            if(it->body_length == 0) {
+                tr = NULL;
+                break;
+            }
             _formula* fr = Utils::convertRuleBodyToFormula(*it);
             if(fr == NULL) break;
             if(tr == NULL) {
