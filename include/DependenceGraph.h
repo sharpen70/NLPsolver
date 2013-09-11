@@ -26,10 +26,12 @@ public:
     vector<_formula*> getExtendSupportRulesWithSize(int k);
     vector<int> getESRSizes();
     
+    vector< vector<int> > loops;
+    
 private:
     vector<Rule> nlp;
     map<int, vector<int> > dpdGraph;
-    vector< vector<int> > loops;
+    
     vector< vector<Rule> > extendSupportRulesForLoops;
     map<int, vector<_formula*> > extendSupportRulesWithSize;   //map[k] = esr (size(esr) = k)
     int visitedNodes[MAX_ATOM_NUMBER];

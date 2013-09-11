@@ -38,7 +38,7 @@ void yyerror(const char* s)
 %token <s> COMMA
 %token <s> PERIOD
 
-%type <s> terms atom
+%type <s> term terms atom
 %type <i> literal
 %type <l> literals
 %type <r> rule
@@ -132,14 +132,23 @@ atom
 ;
 
 terms
-    : terms COMMA S_VARI {
+    : terms COMMA term {
         char str_buff[512];
         
         sprintf(str_buff, "%s,%s", $1, $3);
-        strcpy($$, str_buff);
+        $$ = strdup(str_buff);
+    }
+    | term {
+        $$ = strdup($1);
+    }
+;
+
+term
+    : S_ATOM {
+        $$ = strdup($1);
     }
     | S_VARI {
-        strcpy($$, $1);
+        $$ = strdup($1);
     }
 ;
 %%
