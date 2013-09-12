@@ -55,32 +55,51 @@ void DependenceGraph::DFSFindLoops() {
             
             vector<int> lats;
             lats.push_back(it->first);
-            dfsFind(it->first, it->first, lats);
+            dfsFind(it->first, lats);
         }
     }
 }
 
-void DependenceGraph::dfsFind(int cur_node, int des_node, vector<int> loop_atoms) {
+void DependenceGraph::dfsFind(int cur_node, vector<int> loop_atoms) {
     vector<int> edges = dpdGraph[cur_node];
-    
+   // printf("cur %s, des %s ", Vocabulary::instance().getAtom(cur_node), Vocabulary::instance().getAtom(des_node));
+    fflush(stdout);
+    printf("loop_atoms ");
+    for(vector<int>::iterator it = loop_atoms.begin(); it != loop_atoms.end(); it++) {
+        printf("%s ", Vocabulary::instance().getAtom(*it));
+    }
     for(int i = 0; i < edges.size(); i++) {
+        printf("\n%s edges %s \n", Vocabulary::instance().getAtom(cur_node), Vocabulary::instance().getAtom(edges.at(i)));
+        fflush(stdout);
         visitedNodes[edges.at(i)] = 1;
 
-        if(edges.at(i) == des_node) {
-            loops.push_back(loop_atoms);
-        }
-        else {
+//        if(edges.at(i) == des_node) {
+//            printf("loop ");
+//            for(vector<int>::iterator it = loop_atoms.begin(); it != loop_atoms.end(); it++) {
+//                printf("%s ", Vocabulary::instance().getAtom(*it));
+//            }
+//            loops.push_back(loop_atoms);
+//        }
+//        else {
             vector<int> tloop = Utils::divideListAt(edges.at(i), loop_atoms);
             
             if(tloop.size() == 0) {
-                loop_atoms.push_back(edges.at(i));
-                dfsFind(edges.at(i), des_node, loop_atoms);
+                vector<int> tloop_atoms = loop_atoms;
+                tloop_atoms.push_back(edges.at(i));
+                dfsFind(edges.at(i), tloop_atoms);
             }
             else {
-                loops.push_back(tloop);
+                if(addedNodes[edges.at(i)] != 1) {
+                    printf("loop ");
+                    for(vector<int>::iterator it = tloop.begin(); it != tloop.end(); it++) {
+                        printf("%s ", Vocabulary::instance().getAtom(*it));
+                    }
+                    loops.push_back(tloop);
+                }
             }
-        }
+//        }
     }
+    addedNodes[cur_node] = 1;
 }
 
 void DependenceGraph::findESRules() {
@@ -119,10 +138,10 @@ void DependenceGraph::test() {
     printf("\nThe dpdGraph :\n");
     for(map<int, vector<int> >::iterator mit  = dpdGraph.begin(); 
             mit != dpdGraph.end(); mit++) {
-        printf("The head : %d,   The body : ", mit->first);
+        printf("The head : %s,   The body : ", Vocabulary::instance().getAtom(mit->first));
         for(vector<int>::iterator bodyit = mit->second.begin();
                 bodyit != mit->second.end(); bodyit++) {
-            printf("%d, ", *bodyit);
+            printf("%s, ", Vocabulary::instance().getAtom(*bodyit));
         }
         printf("\n");
     }
@@ -135,7 +154,7 @@ void DependenceGraph::test() {
         printf("L%d : ", i++);
         for(vector<int>::iterator lit = (*it).begin(); 
                 lit != (*it).end(); lit++) {
-            printf("%d, ", *lit);
+            printf("%s, ", Vocabulary::instance().getAtom(*lit));
         }
         printf("\n");
     }

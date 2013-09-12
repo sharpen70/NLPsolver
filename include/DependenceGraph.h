@@ -35,8 +35,9 @@ private:
     vector< vector<Rule> > extendSupportRulesForLoops;
     map<int, vector<_formula*> > extendSupportRulesWithSize;   //map[k] = esr (size(esr) = k)
     int visitedNodes[MAX_ATOM_NUMBER];
+    int addedNodes[MAX_ATOM_NUMBER];
     
-    void dfsFind(int cur_node, int des_node, vector<int> loop_atoms);
+    void dfsFind(int cur_node, vector<int> loop_atoms);
     void findESRules();
 };
 
