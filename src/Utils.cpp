@@ -101,9 +101,9 @@ void Utils::deleteFormula(_formula* _fml) {
     free(_fml);
 }
 
-bool Utils::inList(int tag, vector<int> list) {
-    for(int i = 0; i < list.size(); i++) {
-        if(tag == list.at(i)) return true;       
+bool Utils::inList(int tag, set<int> list) {
+    if(list.find(tag) != list.end()) {
+        return true;
     }
     
     return false;
@@ -124,9 +124,9 @@ vector<int> Utils::divideListAt(int tag, vector<int> list) {
     return result;
 }
 
-bool Utils::crossList(vector<int> l1, vector<int> l2) {
-    for(int i = 0; i < l1.size(); i++) {
-        if(inList(l1.at(i), l2)) return true;
+bool Utils::crossList(vector<int> l1, set<int> l2) {
+    for(vector<int>::iterator it = l1.begin(); it != l1.end(); it++) {
+        if(inList(*it, l2)) return true;
     }
     
     return false;

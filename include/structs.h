@@ -1,8 +1,11 @@
+#include <map>
+
 #ifndef STRUCTS_H
 #define	STRUCTS_H
 
 #define MAX_ATOM_LENGTH 512
 #define MAX_ATOM_NUMBER 1024
+
 // Type definition
 ////////////////////////////////////////////////////////////////////////////////
 enum BOOL {
@@ -51,6 +54,7 @@ typedef struct __formula {
         __formula* subformula_r;   //CONJ,DISJ,IMPL
     };
 }_formula;
+
 
 #endif
 
