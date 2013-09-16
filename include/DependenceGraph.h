@@ -38,7 +38,12 @@ struct Hash {
         sum = getSum(array, size);
         squareSum = getSquareSum(array, size);
     }
-
+    
+    Hash(set<int> array) {
+        sum = getSum(array);
+        squareSum = getSquareSum(array);
+    }
+    
     int getSum(int *array, int size) {
         int res = 0;
         for (int i = 0; i < size; i ++) {
@@ -46,8 +51,24 @@ struct Hash {
         }
         return res;
     }
-
-    int getSquareSum(int *array, int size) {
+    
+    int getSum(set<int> array) {
+        int res = 0;
+        for (set<int>::iterator it = array.begin(); it != array.end(); it++) {
+            res += *it;
+        }
+        return res;
+    }
+    
+    int getSquareSum(set<int> array) {
+        int res = 0;
+        for (set<int>::iterator it = array.begin(); it != array.end(); it++) {
+            res += (*it) * (*it);
+        }
+        return res;
+    }
+    
+    int getSquareSum(int* array, int size) {
         int res = 0;
         for (int i = 0; i < size; i ++) {
             res += array[i] * array[i];
@@ -112,6 +133,7 @@ private:
     int edgePointer;
     int *heads;
     Edge *edges;
+    map<Hash, bool> loopHash;
 };
 
 #endif	/* DEPENDENCEGRAPH_H */

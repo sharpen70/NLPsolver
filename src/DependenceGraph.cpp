@@ -20,30 +20,38 @@
 #include <algorithm>
 #include <functional>
 
-#define NODE_NUM 1000
-#define EDGE_NUM 1000000
-
 DependenceGraph::DependenceGraph(vector<Rule> _nlp) :
                 nlp(_nlp) {
     map< pair<int, int>, bool> graph;
-
+    set<int> nodeSet;
+     
     for(vector<Rule>::iterator it = _nlp.begin(); it != _nlp.end(); it++) {        
         if(it->head > 0 && it->positive_literals.size() > 0) {
+            nodeSet.insert(it->head);
             for(vector<int>::iterator p_it = it->positive_literals.begin(); p_it != it->positive_literals.end(); p_it++) {
                 dpdGraph[it->head].insert(*p_it);
+                nodeSet.insert(*p_it);
             }
         }
     }
     
-    nodeNumber = dpdGraph.size();
+    FILE* out = fopen("res/output/sample.out", "w");
+    
+    edgePointer = 0;
+    nodeNumber = *(--nodeSet.end());
     edgeNumber = 0;
+    
+    fprintf(out, "%d ", nodeNumber);
+  
     
     for(map<int, set<int> >::iterator it = dpdGraph.begin(); it != dpdGraph.end(); it++) {
         edgeNumber += it->second.size();
     }
     
-    heads = new int[nodeNumber];
-    memset(heads, -1, sizeof(int) * nodeNumber);
+    fprintf(out, "%d\n", edgeNumber);
+    
+    heads = new int[nodeNumber + 1];
+    memset(heads, -1, sizeof(int) * (nodeNumber + 1));
 
     edges = new Edge[edgeNumber];
     memset(edges, -1, sizeof(Edge) * edgeNumber);
@@ -54,6 +62,7 @@ DependenceGraph::DependenceGraph(vector<Rule> _nlp) :
             if(graph[temp] != true) {
                 graph[temp] = true;
                 addEdge(it->first, *p_it);
+                fprintf(out, "%d %d\n", it->first, *p_it);
             }           
         }
     }
@@ -69,15 +78,15 @@ DependenceGraph::~DependenceGraph() {
     
     nodeNumber = edgeNumber = edgePointer = 0;
 
-//    if (heads) {
-//        delete[] heads;
-//        heads = NULL;
-//    }
-//
-//    if (edges) {
-//        delete[] edges;
-//        edges = NULL;
-//    }
+    if (heads) {
+        delete[] heads;
+        heads = NULL;
+    }
+
+    if (edges) {
+        delete[] edges;
+        edges = NULL;
+    }
 }
 
 void DependenceGraph::addEdge(int x, int y) {
@@ -90,7 +99,9 @@ void DependenceGraph::addEdge(int x, int y) {
 void DependenceGraph::dfs(int depth, int x, Info &info) {
     int *path = info.path;
     bool *vis = info.vis;
-
+    
+    if (x < info.startPoint) return ;
+    
     path[depth] = x;
 
     if (depth > 0 && x == info.startPoint) {
@@ -101,7 +112,11 @@ void DependenceGraph::dfs(int depth, int x, Info &info) {
             for (int i = 0; i < depth; i ++) {
                 loop.insert(path[i]);
             }
-            loops.push_back(loop);
+            Hash lhash(loop);
+            if(!loopHash[lhash]) {
+                loopHash[lhash] = true;
+                loops.push_back(loop);
+            }
         }
     }
 
@@ -117,11 +132,11 @@ void DependenceGraph::dfs(int depth, int x, Info &info) {
 void DependenceGraph::find() {
     Info info;
 
-    info.path = new int[EDGE_NUM];
-    memset(info.path, -1, sizeof(int) * EDGE_NUM);
+    info.path = new int[edgeNumber];
+    memset(info.path, -1, sizeof(int) * edgeNumber);
 
-    info.vis = new bool[EDGE_NUM];
-    memset(info.vis, false, sizeof(bool) * EDGE_NUM);
+    info.vis = new bool[edgeNumber];
+    memset(info.vis, false, sizeof(bool) * edgeNumber);
 
     for (int i = 1; i <= nodeNumber; i ++) {
         info.startPoint = i;
