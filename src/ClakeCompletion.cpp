@@ -36,7 +36,9 @@ vector<_formula*> ClakeCompletion::convert() {
                 tr = NULL;
                 break;
             }
+            
             _formula* fr = Utils::convertRuleBodyToFormula(*it);
+            
             if(fr == NULL) break;
             if(tr == NULL) {
                 tr = fr;
@@ -68,17 +70,16 @@ vector<_formula*> ClakeCompletion::convert() {
         
         completion.push_back(nega_atom);
     }
-    
     for(vector<Rule>::iterator it = constrants.begin(); it != constrants.end(); 
             it++) {
         _formula* fc = Utils::convertRuleBodyToFormula(*it);     
         
         fc = Utils::compositeByConnective(NEGA, fc);
+        fc = NNFUtils::convertToNegativeNormalForm(fc);
         vector<_formula*> joinf;
-        joinf.push_back(NNFUtils::convertToNegativeNormalForm(fc));
-        Utils::joinFormulas(completion, joinf);
+        joinf.push_back(fc);
+        completion = Utils::joinFormulas(completion, joinf);
     }
-    
     return completion;
 }
 
@@ -118,7 +119,7 @@ void ClakeCompletion::testCompletion() {
         for(set<int>::iterator s_it = it->begin(); s_it != it->end(); s_it++) {
             printf("%d ", *s_it);
         }
-        printf("0\n");
+        printf("\n");
     }
 }
 void ClakeCompletion::test() {

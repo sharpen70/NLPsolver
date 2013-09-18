@@ -19,14 +19,13 @@ private:
     Vocabulary& operator =(const Vocabulary&);
     ~Vocabulary();
     
-    int queryAtom(char*);
-
 public:
     static Vocabulary& instance();
     void dumpVocabulary(FILE* _out);
     int addAtom(char*);
     int apSize();
     char* getAtom(int id);
+    int queryAtom(char*);
 };
 
 #endif

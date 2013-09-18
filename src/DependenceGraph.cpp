@@ -69,7 +69,6 @@ DependenceGraph::DependenceGraph(vector<Rule> _nlp) :
                    
     
     loops.clear();
-    memset(visitedNodes, 0, sizeof(int) * MAX_ATOM_NUMBER);
 }
 
 DependenceGraph::~DependenceGraph() {
@@ -108,11 +107,11 @@ void DependenceGraph::dfs(int depth, int x, Info &info) {
         Hash hash(path, depth);
         if (!info.m[hash]) {
             info.m[hash] = true;
-            set<int> loop;
+            Loop loop;
             for (int i = 0; i < depth; i ++) {
-                loop.insert(path[i]);
+                loop.loopNodes.insert(path[i]);
             }
-            Hash lhash(loop);
+            Hash lhash(loop.loopNodes);
             if(!loopHash[lhash]) {
                 loopHash[lhash] = true;
                 loops.push_back(loop);
@@ -144,63 +143,22 @@ void DependenceGraph::find() {
     }
 }
 
-//void DependenceGraph::DFSFindLoops() {
-//    for(map<int, vector<int> >::iterator it = dpdGraph.begin(); it != dpdGraph.end();
-//            it++) {
-//        if(visitedNodes[it->first] == 0) {
-//            visitedNodes[it->first] = 1;
-//            
-//            vector<int> lats;
-//            lats.push_back(it->first);
-//            dfsFind(it->first, lats);
-//        }
-//    }
-//}
-//
-//void DependenceGraph::dfsFind(int cur_node, vector<int> loop_atoms) {
-//    vector<int> edges = dpdGraph[cur_node];
-//    
-//    for(int i = 0; i < edges.size(); i++) {
-//        visitedNodes[edges.at(i)] = 1;
-//        
-//        vector<int> tloop = Utils::divideListAt(edges.at(i), loop_atoms);
-//
-//        if(tloop.size() == 0) {
-//            vector<int> tloop_atoms = loop_atoms;
-//            tloop_atoms.push_back(edges.at(i));
-//            dfsFind(edges.at(i), tloop_atoms);
-//        }
-//        else {
-//            if(addedNodes[edges.at(i)] != 1) {
-//                loops.push_back(tloop);
-//            }
-//        }
-//    }
-//    addedNodes[cur_node] = 1;
-//}
-
 void DependenceGraph::findESRules() {
-    vector<Rule> _nlp;
-    for(vector<Rule>::iterator it = nlp.begin(); it != nlp.end(); it++) {
-        _nlp.push_back(*it);
-    }
-    
-    for(vector< set<int> >::iterator it = loops.begin(); it != loops.end(); it++) {
-        vector<Rule> esr;
-        for(vector<Rule>::iterator r = _nlp.begin(); r != _nlp.end(); r++) {
-//            if(!(Utils::crossList(loops.at(i), r->positive_literals)
-//                    || Utils::crossList(loops.at(i), r->negative_literals))) {
+    for(vector<Loop>::iterator it = loops.begin(); it != loops.end(); it++) {
+        int index = -1;
+        for(vector<Rule>::iterator r = nlp.begin(); r != nlp.end(); r++) {
+            index++;
+            
             if(r->body_length == 0) {
                 continue;
             }
-            if(Utils::inList(r->head, *it) && 
-                    (!(Utils::crossList(r->positive_literals, *it)) && 
-                    !(Utils::crossList(r->negative_literals, *it)))) {
-                esr.push_back(*r);
-               // r = _nlp.erase(r);               
+            
+            if(Utils::inList(r->head, it->loopNodes) && 
+                    (!(Utils::crossList(r->positive_literals, it->loopNodes)) && 
+                    !(Utils::crossList(r->negative_literals, it->loopNodes)))) {
+                it->ESRules.push_back(index);              
             }
         }
-        extendSupportRulesForLoops.push_back(esr);
     }
 }
 
@@ -224,146 +182,138 @@ void DependenceGraph::test() {
     }
     
     find();
+    computeLoopFormulas();
     printf("\nThe loops :\n");
+    
     int i = 1;
-    for(vector< set<int> >::iterator it = loops.begin(); 
+    for(vector<Loop>::iterator it = loops.begin(); 
             it != loops.end(); it++) {
         printf("L%d : ", i++);
-        for(set<int>::iterator lit = (*it).begin(); 
-                lit != (*it).end(); lit++) {
+        for(set<int>::iterator lit = it->loopNodes.begin(); 
+                lit != it->loopNodes.end(); lit++) {
             printf("%s, ", Vocabulary::instance().getAtom(*lit));
         }
         printf("\n");
-    }
-    
-    printf("\nNLP size %d\n", nlp.size());
-    
-    findESRules();
-    int j = 1;
-    printf("\nThe extendSupportRulesForLoops :\n");
-    for(vector< vector<Rule> >::iterator eit = extendSupportRulesForLoops.begin();
-            eit != extendSupportRulesForLoops.end(); eit++) {
-        printf("\nExtendSupport for loop %d :\n", j++);
-        for(vector<Rule>::iterator rit = (*eit).begin(); rit != (*eit).end(); rit++) {
-            (*rit).output(stdout);
+        printf("ESupport: \n");
+        for(vector<int>::iterator rit = it->ESRules.begin(); rit != it->ESRules.end();
+                rit++) {
+            nlp.at(*rit).output(stdout);
+        }
+        printf("LoopFormula: \n");
+        for(vector<_formula*>::iterator fit = it->loopFormulas.begin();
+                fit != it->loopFormulas.end(); fit ++) {
+            Utils::formulaOutput(stdout, *fit);
         }
         printf("\n");
     }
-    printf("\nNLP size %d\n", nlp.size());
-    
-    
-    //-----------------LOOP FORMULA-----------------------------
-    vector<_formula*> lf = computeLoopFormulas();
-    printf("\nThe loop formulas :\n");
-    for(vector<_formula*>::iterator it = lf.begin(); it != lf.end(); it++) {
-        Utils::formulaOutput(stdout, *it);
-        printf("\n");
-    }
-    
-   printf("\nLF to sat input :\n");
-    //convert to CNF for the input
-    vector<_formula*> input;
-    for(vector<_formula*>::iterator it = lf.begin(); it != lf.end(); it++) {
-        vector<_formula*> cnflf = CNFUtils::convertCNF(*it);
-        input = Utils::joinFormulas(input, cnflf);
-    }
-    for(vector<_formula*>::iterator it = input.begin(); it != input.end(); it++) {
-        Utils::formulaOutput(stdout, *it);
-        printf("\n");
-    }
-    
-    vector< set<int> > satInput = Utils::convertToSATInput(input);
-    for(vector< set<int> >::iterator siit = satInput.begin(); 
-            siit != satInput.end(); siit++) {
-        for(set<int>::iterator sit = (*siit).begin(); 
-                sit!= (*siit).end(); sit++) {
-            printf("%d ", *sit);
-        }
-        printf("\n");
-    }
-    
-    //extendSupportWithSize
-    printf("\nThe Extend support with size : total %d\n", extendSupportRulesWithSize.size());
-    for(map<int, vector<_formula*> >::iterator it = extendSupportRulesWithSize.begin();
-            it != extendSupportRulesWithSize.end(); it++) {
-        printf("size %d :\n", it->first);
-        for(vector<_formula*>::iterator vit = it->second.begin();
-                vit != it->second.end(); vit++) {
-            Utils::formulaOutput(stdout, *vit);
-            printf("\n");
-        }
-    }
+//    
+//    
+//    //-----------------LOOP FORMULA-----------------------------
+//    vector<_formula*> lf = computeLoopFormulas();
+//    printf("\nThe loop formulas :\n");
+//    for(vector<_formula*>::iterator it = lf.begin(); it != lf.end(); it++) {
+//        Utils::formulaOutput(stdout, *it);
+//        printf("\n");
+//    }
+//    
+//   printf("\nLF to sat input :\n");
+//    //convert to CNF for the input
+//    vector<_formula*> input;
+//    for(vector<_formula*>::iterator it = lf.begin(); it != lf.end(); it++) {
+//        vector<_formula*> cnflf = CNFUtils::convertCNF(*it);
+//        input = Utils::joinFormulas(input, cnflf);
+//    }
+//    for(vector<_formula*>::iterator it = input.begin(); it != input.end(); it++) {
+//        Utils::formulaOutput(stdout, *it);
+//        printf("\n");
+//    }
+//    
+//    vector< set<int> > satInput = Utils::convertToSATInput(input);
+//    for(vector< set<int> >::iterator siit = satInput.begin(); 
+//            siit != satInput.end(); siit++) {
+//        for(set<int>::iterator sit = (*siit).begin(); 
+//                sit!= (*siit).end(); sit++) {
+//            printf("%d ", *sit);
+//        }
+//        printf("\n");
+//    }
+//    
+//    //extendSupportWithSize
+//    printf("\nThe Extend support with size : total %d\n", extendSupportRulesWithSize.size());
+//    for(map<int, vector<_formula*> >::iterator it = extendSupportRulesWithSize.begin();
+//            it != extendSupportRulesWithSize.end(); it++) {
+//        printf("size %d :\n", it->first);
+//        for(vector<_formula*>::iterator vit = it->second.begin();
+//                vit != it->second.end(); vit++) {
+//            Utils::formulaOutput(stdout, *vit);
+//            printf("\n");
+//        }
+//    }
 }
 
 
 vector<_formula*> DependenceGraph::computeLoopFormulas() {
     vector<_formula*> loopformulas;
-    set<int> k;
     
-    //DFSFindLoops();
     findESRules();
     
-    //loop formula head
-    vector<_formula*> head;
     printf("The loops size : %d\n", loops.size());
-    for(vector< set<int> >::iterator it = loops.begin(); 
-            it != loops.end(); it++) {
-        //loop formula head
-        _formula* _head = NULL;
-        for(set<int>::iterator hit = it->begin();
-                hit != it->end(); hit++) {
-            if(_head == NULL) _head = Utils::compositeToAtom(*(it->begin()));
-            else _head = Utils::compositeByConnective(CONJ, _head
-                    , Utils::compositeToAtom(*hit));
-        }
-        head.push_back(Utils::copyFormula(_head));
-        Utils::deleteFormula(_head);
-    }
-        
-    //loop formula body
-    vector<_formula*> body;
-    for(vector< vector<Rule> >::iterator bit = extendSupportRulesForLoops.begin();
-                bit != extendSupportRulesForLoops.end(); bit++) {  
-        k.insert((*bit).size());
-        
-        if(bit->size() == 0) {
-            _formula* _body = Utils::compositeToAtom(-1);
-            body.push_back(_body);
-        }
-        else {
-            _formula* _body = Utils::convertRuleBodyToFormula(*((*bit).begin()));
-            for(vector<Rule>::iterator rit = (*bit).begin()+1; rit != (*bit).end(); rit++) {       
-                _body = Utils::compositeByConnective(DISJ, _body, 
-                                            Utils::convertRuleBodyToFormula(*rit));         
-            }       
-            body.push_back(Utils::copyFormula(_body));       
-            Utils::deleteFormula(_body);
-        }
-    }
     
-    //loop formula
-    for(int i = 0; i < head.size(); i++) {
-        _formula* lf;
+    for(vector<Loop>::iterator it = loops.begin(); it != loops.end(); it++) {
+        _formula* _head = NULL;
         
-        _formula* nhead = Utils::compositeByConnective(NEGA, head.at(i), NULL);
-        if(body.at(i)->formula_type == ATOM && body.at(i)->predicate_id == -1) {
-            lf = nhead;           
+        for(set<int>::iterator hit = it->loopNodes.begin(); hit != it->loopNodes.end();
+                hit++) {
+            if(_head == NULL) _head = Utils::compositeByConnective(NEGA,
+                    Utils::compositeToAtom(*hit));
+            else {
+                _formula* newhead = Utils::compositeByConnective(NEGA,
+                    Utils::compositeToAtom(*hit));
+                _head = Utils::compositeByConnective(DISJ, _head, newhead);
+            }
         }
-        else {
-            lf = Utils::compositeByConnective(DISJ, nhead, body.at(i));
+        printf("formula head:");
+        Utils::formulaOutput(stdout, _head);
+        fflush(stdout);
+        _formula* _body = NULL;
+        for(vector<int>::iterator rit = it->ESRules.begin(); rit != it->ESRules.end();
+                rit++) {
+            char newAtom[MAX_ATOM_LENGTH];
+            sprintf(newAtom, "Rule_%d", *rit);
+            int id = Vocabulary::instance().queryAtom(newAtom);
+            if(id < 0) {
+                id = Vocabulary::instance().addAtom(strdup(newAtom));
+                _formula* rule = Utils::convertRuleBodyToFormula(nlp.at(*rit));
+                _formula* nega = Utils::compositeByConnective(NEGA, 
+                        Utils::copyFormula(rule));
+                _formula* l1 = Utils::compositeByConnective(DISJ, nega,
+                        Utils::compositeToAtom(id));
+                _formula* l2 = Utils::compositeByConnective(DISJ, rule,
+                        Utils::compositeByConnective(NEGA, Utils::compositeToAtom(id)));
+                it->loopFormulas = Utils::joinFormulas(it->loopFormulas, 
+                        CNFUtils::convertCNF(l1));
+                it->loopFormulas = Utils::joinFormulas(it->loopFormulas, 
+                        CNFUtils::convertCNF(l2));
+            }
+            
+            if(_body == NULL) {
+                _body = Utils::compositeToAtom(id);
+            } 
+            else {
+                _body = Utils::compositeByConnective(DISJ, _body, Utils::compositeToAtom(id));
+            }
         }
-        loopformulas.push_back(Utils::copyFormula(lf));
-        Utils::deleteFormula(lf);
-    }
-   
-    //Set to the map with index k
-    for(set<int>::iterator it = k.begin(); it != k.end(); it++) {
-        vector<_formula*> hold;
-        for(int i = 0; i < loopformulas.size(); i++) {
-            if(*it == extendSupportRulesForLoops.at(i).size())
-                hold.push_back(Utils::copyFormula(loopformulas.at(i)));
-        }
-        extendSupportRulesWithSize[*it] = hold;
+        printf("formula body:");
+        Utils::formulaOutput(stdout, _body);
+        fflush(stdout);
+        _formula* lf;
+        if(_body == NULL) lf = _head;
+        else lf = Utils::compositeByConnective(DISJ, _head, _body);
+        Utils::formulaOutput(stdout, lf);
+        it->loopFormulas.push_back(lf);
+        
+//        extendSupportRulesWithSize[it->ESRules.size()] = Utils::joinFormulas(
+//                extendSupportRulesWithSize[it->ESRules.size()], it->loopFormulas);
     }
     
     return loopformulas;

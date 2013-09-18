@@ -12,6 +12,7 @@
 #include <map>
 #include <set>
 #include "Rule.h"
+#include "Utils.h"
 
 struct Edge {
     int x, y;
@@ -98,6 +99,36 @@ struct Info {
     }
 };
 
+struct Loop {
+    set<int> loopNodes;
+    vector<int> ESRules;
+    vector<_formula*> loopFormulas;
+    
+    Loop() {
+        loopNodes.clear();
+        loopFormulas.clear();
+        ESRules.clear();
+    }
+    Loop(const Loop& l) {
+        loopNodes = l.loopNodes;
+        ESRules = l.ESRules;
+        for(vector<_formula*>::const_iterator it = l.loopFormulas.begin(); 
+                it != l.loopFormulas.end(); it++) {
+            loopFormulas.push_back(Utils::copyFormula(*it));
+        }
+    }
+    
+    ~Loop() {
+        for(vector<_formula*>::iterator it = loopFormulas.begin(); 
+                it != loopFormulas.end(); it++) {
+            Utils::deleteFormula(*it);
+        }
+        loopNodes.clear();
+        loopFormulas.clear();
+        ESRules.clear();
+    }
+};
+
 class DependenceGraph {
 public:
     DependenceGraph(vector<Rule> _dlp);
@@ -112,19 +143,15 @@ public:
     vector<_formula*> getExtendSupportRulesWithSize(int k);
     vector<int> getESRSizes();
     
-    vector< set<int> > loops;
+    vector<Loop> loops;
     
     
 private:
     vector<Rule> nlp;
     map<int, set<int> > dpdGraph;
     
-    vector< vector<Rule> > extendSupportRulesForLoops;
-    map<int, vector<_formula*> > extendSupportRulesWithSize;   //map[k] = esr (size(esr) = k)
-    int visitedNodes[MAX_ATOM_NUMBER];
-    int addedNodes[MAX_ATOM_NUMBER];
+    map<int, vector<_formula*> > extendSupportRulesWithSize;
     
-    //void dfsFind(int cur_node, vector<int> loop_atoms);
     void findESRules();
     void addEdge(int x, int y);
     void dfs(int depth, int x, Info &info);
